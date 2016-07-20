@@ -1,9 +1,36 @@
 # Setup
 
-    sudo -u postgres createuser -s app-tomify # Add Postgres User
-    adduser app-tomify                        # Add Linux User
+    adduser {name}
 
-## Redis Setup
+### Postgres
+
+    psql -U postgres -c "CREATE USER {name} WITH PASSWORD '{password}';"
+
+Update ENV
+
+    ENV["DATABASE_URL"] = postgresql://{name}:{password}@localhost/{name}
+
+Create the database
+
+    RAILS_ENV=production rails db:setup
+
+### Assets
+
+    RAILS_ENV=production rails assets:precompile
+
+### Unicorn
+
+    sudo cp /etc/init.d/unicorn_example /etc/init.d/unicorn_{name}
+    sudo cp /etc/unicorn/config.rb /home/{name}/{name}/config/unicorn.rb
+
+Update references of example to {name}
+
+    sudo update-rc.d unicorn_{name} defaults
+    sudo service unicorn_{name} start
+
+### Nginx
+
+### Redis
 
     sudo cp /etc/init.d/redis_6379 /etc/init.d/redis_{port}
     sudo cp /etc/redis/6379.conf /etc/redis/{port}.conf
@@ -16,27 +43,28 @@ Update references of 6379 to {port}
 
 http://redis.io/topics/quickstart
 
-# Breakdown
-
-    sudo -u postgres dropuser app-tomify
-    sudo userdel app-tomify
-    sudo rm -rf /home/app-tomify
+### Lets Encryot
 
 # Update
 
+    RAILS_ENV=production rails assets:precompile
+    RAILS_ENV=production rails db:migrate
     service unicorn restart && service nginx reload
+
+# Breakdown
+
+    sudo userdel {name}
+    sudo rm -rf /home/{name}
+    sudo -u postgres dropuser {name}
 
 # TODO
 
-  - rvm
-  - rails
-  - unicorn
+  - unicorn per app
+  - nginx per app
+  - different port per app config?
   - letsencrypt per app
-  - postgres app config
-  - nginx app config
-
-# App Config
-
-  - https://www.digitalocean.com/community/tutorials/how-to-deploy-a-rails-app-with-unicorn-and-nginx-on-ubuntu-14-04
 
 # References
+
+  - http://redis.io/topics/quickstart
+  - https://www.digitalocean.com/community/tutorials/how-to-deploy-a-rails-app-with-unicorn-and-nginx-on-ubuntu-14-04

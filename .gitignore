@@ -11,9 +11,13 @@
 !/home/tom/.vim/colors/tomify.vim
 !/etc
 !/etc/init.d
+!/etc/init.d/nginx
 !/etc/init.d/redis_6379
+!/etc/init.d/unicorn_example
 !/etc/redis
 !/etc/redis/6379.conf
+!/etc/unicorn
+!/etc/unicorn/config.rb
 !/var
 !/var/redis
 !/var/redis/6379
