@@ -2,7 +2,7 @@
 
     adduser {name}
 
-### Postgres
+## Postgres
 
     psql -U postgres -c "CREATE USER {name} WITH PASSWORD '{password}';"
 
@@ -14,11 +14,11 @@ Create the database
 
     RAILS_ENV=production rails db:setup
 
-### Assets
+## Assets
 
     RAILS_ENV=production rails assets:precompile
 
-### Unicorn
+## Unicorn
 
     sudo cp /etc/init.d/unicorn_example /etc/init.d/unicorn_{name}
     sudo cp /etc/unicorn/config.rb /home/{name}/{name}/config/unicorn.rb
@@ -28,9 +28,16 @@ Update references of example to {name}
     sudo update-rc.d unicorn_{name} defaults
     sudo service unicorn_{name} start
 
-### Nginx
+## Nginx
 
-### Redis
+    sudo cp /etc/nginx/sites-available/example /etc/nginx/sites-available/{name}
+    sudo ln -s /etc/nginx/sites-available/{name} /etc/nginx/sites-enabled/{name}
+
+Update unicorn.example.sock to unicorn.{name}
+Update references of example.com to {url}
+Replace root with /home/{user}/{name}/public
+
+## Redis
 
     sudo cp /etc/init.d/redis_6379 /etc/init.d/redis_{port}
     sudo cp /etc/redis/6379.conf /etc/redis/{port}.conf
@@ -43,26 +50,40 @@ Update references of 6379 to {port}
 
 http://redis.io/topics/quickstart
 
-### Lets Encryot
+## Lets Encryot
+
+### Nginx
+
+    sudo cp /etc/nginx/sites-available/example_ssl /etc/nginx/sites-available/{name}
+    sudo ln -s /etc/nginx/sites-available/{name} /etc/nginx/sites-enabled/{name}
+
+Run through remaining nginx steps
 
 # Update
 
     RAILS_ENV=production rails assets:precompile
     RAILS_ENV=production rails db:migrate
-    service unicorn restart && service nginx reload
+    sudo service unicorn_{name} reload && sudo service nginx reload
 
 # Breakdown
 
     sudo userdel {name}
     sudo rm -rf /home/{name}
     sudo -u postgres dropuser {name}
+    sudo rm /etc/nginx/sites-available/{name}
+    sudo rm /etc/nginx/sites-enabled/{name}
+    sudo rm /etc/init.d/unicorn_{name}
+    sudo service delete unicorn_{name}
+    sudo rm /etc/init.d/redis_{port}
+    sudo rm /etc/redis/{port}.conf
+    sudo rm -rf /var/redis/{port}
+    sudo service delete redis_{port}
 
 # TODO
 
-  - unicorn per app
-  - nginx per app
-  - different port per app config?
-  - letsencrypt per app
+  - letsencrypt
+    - add to config
+    - run cron code
 
 # References
 
